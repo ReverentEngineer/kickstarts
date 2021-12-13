@@ -16,7 +16,6 @@ do
   case $key in
     -r|--repository)
       REPOSITORY="$2"
-      echo $REPOSITORY
       shift;
       shift;
       ;;
