@@ -70,9 +70,15 @@ sed -i "s/initrd=initrd.img/initrd=initrd.img inst.repo=hd:LABEL=$LABEL:\/localr
 mkdir -p $ISODIR/localrepo
 if [ -z $REPOSITORY ]
 then
-  dnf download --destdir $ISODIR/localrepo --alldeps --resolve kernel
-  awk '/^%packages/{flag=1;next}/^%end/{flag=0}flag' workstation.cfg  | grep -v "^-" | xargs dnf download --destdir $ISODIR/localrepo --alldeps --resolve
-  createrepo $ISODIR/localrepo
+  $(dirname $0)/download_group_packages.sh --destdir $ISODIR/localrepo core && \
+    awk '/^%packages/{flag=1;next}/^%end/{flag=0}flag' workstation.cfg  | grep -v "^-" | \
+    xargs dnf download --destdir $ISODIR/localrepo --alldeps --resolve && \
+    createrepo $ISODIR/localrepo
+  if [ $? -ne 0 ]
+  then
+    echo "Failed to crete repository"
+    exit 1
+  fi
 else
   cp -rf $REPOSITORY/* $ISODIR/localrepo
 fi

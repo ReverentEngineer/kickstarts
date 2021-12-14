@@ -13,6 +13,7 @@ function print_usage() {
 
 source $(dirname $0)/common.sh
 
+DESTDIR=.
 REPO=fedora-35
 ARCH=x86_64
 
@@ -31,7 +32,11 @@ do
       shift;
       shift;
       ;;
- 
+    --destdir)
+      DESTDIR="$2"
+      shift;
+      shift;
+      ;;
     *)
       POSITIONAL+=("$1")
       shift
@@ -57,4 +62,4 @@ curl -s $MIRROR/repodata/repomd.xml |
   xargs -i curl -s ${MIRROR}{} | \
   xmllint --xpath \
 	"/comps/group[id[contains(text(),\"$1\")]]/packagelist/packagereq/text()" - | \
-  xargs dnf download --alldeps --resolve
+  xargs dnf download --destdir $DESTDIR --alldeps --resolve
