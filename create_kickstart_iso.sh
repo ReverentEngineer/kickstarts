@@ -15,6 +15,7 @@ then
   exit 1
 fi
 
+TEST_ISO=0
 while [[ $# -gt 0 ]]
 do
   key="$1"
@@ -23,6 +24,10 @@ do
     -r|--repository)
       REPOSITORY="$2"
       shift;
+      shift;
+      ;;
+    -t|--test)
+      TEST_ISO=1
       shift;
       ;;
     *)
@@ -78,3 +83,10 @@ genisoimage -U -r -v -T -J -joliet-long -V "$LABEL" -volset "$LABEL" -A "$LABEL"
 popd
 mv $TMPDIR/$LABEL.iso .
 implantisomd5 $LABEL.iso
+
+if [ $TEST_ISO -eq 1 ]
+then
+  echo "Testing ISO with QEMU"
+  qemu-img create -f qcow2 $TMPDIR/image.qcow2 20G
+  qemu-system-x86_64 -accel kvm -m 1024 -cpu host -cdrom $LABEL.iso -boot d -hda $TMPDIR/image.qcow2
+fi
