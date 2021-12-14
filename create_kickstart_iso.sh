@@ -47,7 +47,7 @@ mkdir -p $ISODIR
 trap "rm -rf $TMPDIR" EXIT
 
 # Extract Base OS
-7z x -o$ISODIR $ISO
+7z x -bb0 -o$ISODIR $ISO
 
 # Setup kickstart
 cp $KICKSTART $ISODIR/ks.cfg
