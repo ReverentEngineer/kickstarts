@@ -11,6 +11,8 @@ function print_usage() {
   echo
 }
 
+source $(dirname $0)/common.sh
+
 REPO=fedora-35
 ARCH=x86_64
 
@@ -47,10 +49,12 @@ then
 fi
 
 GROUP=$1
-MIRROR=$(curl -s "https://mirrors.fedoraproject.org/mirrorlist?repo=$REPO&arch=$ARCH" | tail -n +2 | head -n 1)
-GROUP_HREF=$(curl -s ${MIRROR}repodata/repomd.xml | xmllint --xpath "string(/*[local-name()='repomd']/*[local-name()='data' and @type=\"group\"]/*[local-name()='location']/@href)" -)
+MIRROR=$(get_mirror $REPO $ARCH)
 
-curl -s ${MIRROR}${GROUP_HREF} | \
-	xmllint --xpath \
+curl -s $MIRROR/repodata/repomd.xml | 
+  xmllint --xpath \
+  	"string(/*[local-name()='repomd']/*[local-name()='data' and @type=\"group\"]/*[local-name()='location']/@href)" - | \
+  xargs -i curl -s ${MIRROR}{} | \
+  xmllint --xpath \
 	"/comps/group[id[contains(text(),\"$1\")]]/packagelist/packagereq/text()" - | \
-	xargs dnf download --alldeps --resolve
+  xargs dnf download --alldeps --resolve
