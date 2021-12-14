@@ -9,6 +9,12 @@ function print_usage() {
   echo
 }
 
+if [ $(uname -s) != Linux ]
+then
+  echo "Non-Linux systems are currently not supported."
+  exit 1
+fi
+
 while [[ $# -gt 0 ]]
 do
   key="$1"
