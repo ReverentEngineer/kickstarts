@@ -93,6 +93,7 @@ implantisomd5 $LABEL.iso
 if [ $TEST_ISO -eq 1 ]
 then
   echo "Testing ISO with QEMU"
+  rm -rf $ISODIR
   qemu-img create -f qcow2 $TMPDIR/image.qcow2 20G
   qemu-system-x86_64 -accel kvm -m 1024 -cpu host -cdrom $LABEL.iso -boot d -hda $TMPDIR/image.qcow2
 fi
